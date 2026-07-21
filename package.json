@@ -5,13 +5,18 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "start": "ts-node src/server.ts",
     "test": "cucumber-js",
     "test:acceptance": "cucumber-js"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^11.2.0",
+    "@types/express": "^5.0.6",
     "@types/node": "^24.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
   }
 }
