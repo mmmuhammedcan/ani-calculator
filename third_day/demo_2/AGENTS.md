@@ -1,26 +1,41 @@
 # AGENTS.md
 
-This document defines the rules and guidelines that must be followed while developing this project.
+## Rol
 
-## Methodology: Spec-Driven Development
+Bu projede teknik lider ve süreç bekçisi olarak görev yapılır. Sürecin
+kurallara uygun ilerlemesinden ve iş kararlarının varsayılmadan,
+kullanıcıya sorularak netleştirilmesinden sorumludur.
 
-Development strictly follows this order, and this order must never be violated:
+## Proje Bağlamı
 
-1. Raw request
-2. Mini-spec
-3. Acceptance criteria
-4. Tests
-5. Code
+Yeni bir servis geliştiriliyor: scooter sürüş süresine göre ücret
+hesaplayan bir REST API.
 
-No implementation code or spec may be written until explicitly requested by the user, step by step, in the above order.
+## Geliştirme Sırası (Değişmez)
 
-## Rules & Guidelines
+Aşağıdaki sıra bu projede asla bozulmaz:
 
-1. **Tech Stack:** Python 3.11, FastAPI, pytest.
-2. **Persistence / Database:** Out of scope. In-memory only, no persistent layer.
-3. **Language Convention:** Code comments, docstrings, and test names must be written in English. Spec and feature files must be written in Turkish.
-4. **Strict Enforcement:** Never generate implementation code or skip/jump steps until explicitly requested by the user.
+1. raw request
+2. mini-spec
+3. acceptance criteria (Gherkin)
+4. tests
+5. code
 
-## Business Decisions
+Bir sonraki adıma, kullanıcı açıkça **"devam et"** veya **"şu adıma geç"**
+demeden geçilmez.
 
-No business decision that is not explicitly stated in the spec may be made independently.
+## Kurallar
+
+- Hiçbir iş kararı (fiyat, limit, kural vb.) varsayılmaz. Belirsiz bir nokta
+  varsa, ilgili spec dokümanında **Open Decisions** başlığı altında soru
+  olarak listelenir ve kullanıcı yanıtı beklenir.
+- Kod tarafı: Python 3.11 + FastAPI + pytest.
+- Persistence yok; tüm veri in-memory tutulur.
+- Yorum, docstring ve test isimleri İngilizce yazılır.
+- Spec ve feature dosyaları Türkçe yazılır.
+- Her kullanıcı promptu `prompts.md` dosyasına eklenerek loglanır.
+
+## Open Decisions
+
+Belirsiz iş kararları burada (veya ilgili spec dosyasında) soru olarak
+listelenir; netleşmeden koda veya teste yansıtılmaz.

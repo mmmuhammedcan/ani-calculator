@@ -1,58 +1,91 @@
-We will build a simple REST API together. It will have a single service: calculating the fee to be paid based on the duration of a scooter ride via `POST /scooter-fee`.
+# Prompts Log
 
-We will strictly follow the "Spec-Driven Development" methodology during development. The sequence will be as follows, and we must not violate this order:
-raw request -> mini-spec -> acceptance criteria -> tests -> code
+## Prompt 1
 
-Before I explicitly ask you to write code, we will write the spec together. You must NOT make any business decisions that are not explicitly stated in the spec.
+```
+ROLE: Sen bu projenin teknik lideri ve süreç bekçisisin.
 
-Rules & Guidelines:
-1. Tech Stack: Python 3.11, FastAPI, pytest.
-2. Persistence / Database: Out of scope (in-memory only, no persistent layer).
-3. Language Convention: Code comments, docstrings, and test names must be in English. Spec and feature files must be in Turkish.
-4. Strict Enforcement: Never generate implementation code or jump steps until requested.
+CONTEXT: Yeni bir proje başlıyoruz. Servis: scooter sürüş süresine göre
+ücret hesaplayan bir REST API.
 
-First step: Create an `AGENTS.md` file and write down all the rules and guidelines stated above. Do NOT write any application code or spec yet. Just confirm once `AGENTS.md` is created.
+RULES:
+- Bu projede geliştirme SIRASI şudur ve asla bozulmaz:
+  raw request -> mini-spec -> acceptance criteria (Gherkin) -> tests -> code
+- Bir sonraki adıma, kullanıcı açıkça "devam et / şu adıma geç" demeden geçme.
+- Hiçbir iş kararını (fiyat, limit, kural) varsayma; belirsizse Open Decisions
+  altında soru olarak listele.
+- Kod: Python 3.11 + FastAPI + pytest. Persistence yok, in-memory.
+- Yorum/docstring/test isimleri İngilizce; spec ve feature dosyaları Türkçe.
+- Her kullanıcı promptunu prompts.md'ye ekleyerek logla.
 
+OUTPUT: Sadece AGENTS.md dosyasını oluştur (yukarıdaki kuralları içerecek
+şekilde). Başka hiçbir dosya oluşturma. İşin bitince "AGENTS.md hazır,
+onay bekliyorum" de ve dur.
+```
 
-// Second Prompt:
-Role: Act like a software analyst. In this step, your task is NOT TO WRITE CODE.
-Do not write code, do not write tests, do not create application files.
+## Prompt 2
 
-RAW REQUEST
-....
+```
+ROLE: Sen bir iş analistisin. Bu adımda KOD YAZMIYORSUN.
 
-RULES — do not violate:
-1. Do NOT ASSUME any business decisions you do not know. Instead of guessing, write them under the "Open Decisions" section as Q-01, Q-02... and specify who needs to answer each question.
-2. Do NOT write a business rule (BR) for an undecided topic. An undecided decision cannot have an acceptance criterion.
-3. Separate business rules from technical constraints into DIFFERENT sections:
-   - Price, duration, threshold, cap, exemption -> Business Rule
-   - Decimal, rounding, language, framework -> Technical Constraint
-4. If there are open questions affecting the application, the document status CANNOT be "Ready for implementation".
-5. Prompt Logging Rule: Save all of my prompts into a `prompts.md` file at each step as we progress.
+CONTEXT: AGENTS.md'deki kurallara uyuyorsun (oku ve uygula).
 
-OUTPUT SECTIONS — in this exact order, in TURKISH:
-1. Spec Card (status: Draft | Pending decision | Ready for implementation)
-2. Purpose and Success Signal
-3. Scope / Out of Scope
-4. Input, Output, and Error Contract
-5. Business Rules (decided ones; if none, leave blank and state why)
-6. Acceptance Criteria (if unable to write, state why)
+RAW REQUEST:
+"Scooter sürüşünün süresine göre ödenecek ücreti hesaplayan bir servis
+istiyoruz. POST /scooter-fee endpoint'i olacak."
+
+RULES:
+- Bilmediğin her iş kararını (fiyat, limit, ücretsiz süre, hata kodu,
+  yuvarlama yönü, alan adları) VARSAYMA. Q-01, Q-02... formatında sor,
+  kimin cevaplayacağını belirt.
+- Business Rule (fiyat/limit/eşik) ile Technical Constraint (framework/
+  dil/veri tipi) ayrı bölümlerde olsun.
+- Açık soru varken durum "Ready for implementation" OLAMAZ.
+
+OUTPUT (docs/spec/mini-spec.md, bu sırayla, TÜRKÇE):
+1. Spec Card (durum: Draft/Pending decision/Ready)
+2. Amaç ve Başarı Sinyali
+3. Kapsam / Kapsam Dışı
+4. Girdi-Çıktı-Hata Sözleşmesi
+5. Business Rules (kararı verilmişse)
+6. Acceptance Criteria (yazılamıyorsa neden yazılamadığını belirt)
 7. Technical Constraints
-8. Open Decisions (Q-01, ... + who to ask)
+8. Open Decisions (Q-01, Q-02...)
 9. Readiness Check
+```
 
-Create the spec file at docs/spec/mini-spec.md.
-// Third Prompt:
-Q-01: dakika bazlı, dakika başına 5 tl,
+## Prompt 3
 
-// Fourth Prompt:
-Q-02: açılış ücreti 10 tl olucak. Q-03: ücretsiz başlangı. süresi yok. Q-04: üst limit 1000 tl olsun. Q-05 duration_minutes okeydir. Q-06: ban ahngi alan adıyla olabilir örnek ver ona göre devam et onun dışında tl bazlıfiyatlama olucak maksimum iki basamaklı ondalık küsürat olsun. Q-07: hata kodu versin 400 kodu olarak. Q-08: süre yukarı yuvarla.
+```
+Tamamdır, şimdi bunu sektör standartlarında yapmamız lazım. Sen olsan şu
+aşamada nasıl ilerlerdin, nasıl bir yol izlerdin, neyi farklı yapardın ya
+da eklenecek bir adım var mı? Şimdi specleri görüyoruz, mini-spec.md
+dosyasını okuyalım, eksik bir kısım var mı onu cevaplayalım. Onun
+dışında hazır sorular var ya, biz sadece şimdilik deneme yapıyoruz,
+bunların herhangi birini cevap olarak işaretleyebiliriz; onları da
+doldurmanı istiyorum. Mesela spec olarak indirim eklenebilir, hani her
+saatte bir indirim olabilir gibi. Bir de mesela vergi durumu eklenebilir.
+Sektör standartlarına getirmek için aklına neler geliyor şu an? Mesela
+bir başlangıç ücreti olur, mesela onun dışında da işte dediğim gibi
+yarım saatte bir indirim olabilir ya da farklı şeyler, bilmiyorum,
+sektör best practice olmasını istiyorum şu an.
+```
 
-// Fifth Prompt:
-ATDD formatında ilerliycez ATDD gherkin formatı olucak, bunu uygula dah asonra Acceptace Criteria içindeki her bir senaryo için pytest yaz. testleri çalıştır fail olduğunu gör sonra implementasyon yap testleri tekrar çalıştır hespsi geçtiğinden mein ol. ve bu promptu da promts.md dosyasına kaydet
+## Prompt 4
 
-// Sixth Prompt:
-acceptance criteria yazdıktan sonra mini-spec.md dosyasını güncellemeyi onutma  business rules ve acceptance criteria kısımları eksik
+```
+Doldurduktan sonra bu aşamada dur ve AGENTS.md kurallarına sen de riayet
+et. Sonra sektör best practice için benim promptlarımı bekle, öneriler
+sunabilirsin.
+```
 
-// Seventh Prompt:
-eksik bir şey kaldı mı testini yap sonra commit at
+## Prompt 5
+
+```
+fro now you should create and fill gherking files iniate testing by
+using pytest see the fails then apply implementation see validaitons
+write an report about this in a report.md which explains fails and
+validations in different parts also in order to do manual testing
+write the deployment code and manual test examples to see it in fast
+api
+```
