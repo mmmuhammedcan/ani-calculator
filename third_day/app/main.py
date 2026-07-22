@@ -16,6 +16,7 @@ class PriceRequest(BaseModel):
 
     price: Decimal
     discount_percent: Decimal = Field(alias="discount_percent")
+    tax_percent: Decimal = Field(default=Decimal("0"), alias="tax_percent")
 
 
 class PriceResponse(BaseModel):
@@ -23,6 +24,7 @@ class PriceResponse(BaseModel):
 
     price: Decimal
     discount_amount: Decimal
+    tax_amount: Decimal
     final_price: Decimal
     display: str
 
@@ -38,11 +40,14 @@ async def domain_error_handler(request: Request, exc: DomainError) -> JSONRespon
 
 @app.post("/price", response_model=PriceResponse)
 async def price_endpoint(request: PriceRequest) -> PriceResponse:
-    """Calculate discount amount and final price for a given price."""
-    result = calculate_price(request.price, request.discount_percent)
+    """Calculate discount amount, tax amount and final price for a given price."""
+    result = calculate_price(
+        request.price, request.discount_percent, request.tax_percent
+    )
     return PriceResponse(
         price=result.price,
         discount_amount=result.discount_amount,
+        tax_amount=result.tax_amount,
         final_price=result.final_price,
         display=result.display,
     )

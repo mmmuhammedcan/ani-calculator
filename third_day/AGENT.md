@@ -8,9 +8,10 @@ ask the user to repeat these rules.
 
 Small Python + FastAPI REST API with a single endpoint:
 
-- `POST /price` — request: `{"price": 200, "discount_percent": 15}`
-  response: `price`, `discount_amount`, `final_price`, and a human-readable
-  `display` field.
+- `POST /price` — request: `{"price": 200, "discount_percent": 15, "tax_percent": 10}`
+  (`tax_percent` is optional and defaults to `0`)
+  response: `price`, `discount_amount`, `tax_amount`, `final_price`, and a
+  human-readable `display` field.
 
 ## Code rules
 
@@ -23,9 +24,16 @@ Small Python + FastAPI REST API with a single endpoint:
 - Invariant: `discount_amount + final_price` must always equal `price`
   exactly (round `discount_amount` first, then derive `final_price` by
   subtraction — never round both independently).
+- Tax is applied after the discount, on the discounted price:
+  `discounted_price = price - discount_amount`,
+  `tax_amount = discounted_price * tax_percent / 100`,
+  `final_price = discounted_price + tax_amount`. Round `tax_amount` first,
+  then derive `final_price` by addition.
 - Validation:
   - `price` must not be negative.
   - `discount_percent` must be within the `[0, 100]` range.
+  - `tax_percent` is optional (defaults to `0`) and must be within the
+    `[0, 100]` range.
   - Violations raise `DomainError` (defined in `app/pricing.py`), never a
     raw framework exception.
 - Error response shape (HTTP 400):

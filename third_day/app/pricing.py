@@ -26,10 +26,11 @@ class DomainError(Exception):
 
 @dataclass(frozen=True)
 class PriceResult:
-    """Result of a price/discount calculation."""
+    """Result of a price/discount/tax calculation."""
 
     price: Decimal
     discount_amount: Decimal
+    tax_amount: Decimal
     final_price: Decimal
     display: str
 
@@ -39,20 +40,33 @@ def _round(value: Decimal) -> Decimal:
     return value.quantize(TWO_PLACES, rounding=ROUND_HALF_UP)
 
 
-def calculate_price(price: Decimal, discount_percent: Decimal) -> PriceResult:
-    """Calculate discount amount and final price for a given price.
+def calculate_price(
+    price: Decimal,
+    discount_percent: Decimal,
+    tax_percent: Decimal = Decimal("0"),
+) -> PriceResult:
+    """Calculate discount amount, tax amount and final price for a given price.
+
+    The discount is applied first, then tax is calculated on the discounted
+    price:
+
+        discounted_price = price - discount_amount
+        tax_amount = discounted_price * tax_percent / 100
+        final_price = discounted_price + tax_amount
 
     Args:
         price: The original price. Must be >= 0.
         discount_percent: The discount percentage. Must be within [0, 100].
+        tax_percent: The tax percentage applied after the discount. Must be
+            within [0, 100]. Defaults to 0 so existing callers are unaffected.
 
     Returns:
-        A PriceResult containing price, discount_amount, final_price and
-        a human-readable display string.
+        A PriceResult containing price, discount_amount, tax_amount,
+        final_price and a human-readable display string.
 
     Raises:
-        DomainError: If price is negative or discount_percent is out of
-            the [0, 100] range.
+        DomainError: If price is negative, or discount_percent/tax_percent
+            is out of the [0, 100] range.
     """
     if price < 0:
         raise DomainError("INVALID_PRICE", "Price must not be negative.")
@@ -63,22 +77,36 @@ def calculate_price(price: Decimal, discount_percent: Decimal) -> PriceResult:
             "Discount percent must be between 0 and 100.",
         )
 
+    if tax_percent < 0 or tax_percent > 100:
+        raise DomainError(
+            "INVALID_TAX_PERCENT",
+            "Tax percent must be between 0 and 100.",
+        )
+
     rounded_price = _round(price)
 
-    # Round discount_amount first, then derive final_price by subtraction
-    # so that discount_amount + final_price always equals price exactly.
+    # Round discount_amount first, then derive the discounted price by
+    # subtraction so that discount_amount + discounted_price always equals
+    # price exactly.
     discount_amount = _round(rounded_price * discount_percent / Decimal("100"))
-    final_price = rounded_price - discount_amount
+    discounted_price = rounded_price - discount_amount
+
+    # Tax is calculated on the discounted price, rounded first, then the
+    # final price is derived by addition for the same exactness reason.
+    tax_amount = _round(discounted_price * tax_percent / Decimal("100"))
+    final_price = discounted_price + tax_amount
 
     display = (
         f"Price: {rounded_price} | "
         f"Discount: {discount_amount} ({discount_percent}%) | "
+        f"Tax: {tax_amount} ({tax_percent}%) | "
         f"Final Price: {final_price}"
     )
 
     return PriceResult(
         price=rounded_price,
         discount_amount=discount_amount,
+        tax_amount=tax_amount,
         final_price=final_price,
         display=display,
     )
