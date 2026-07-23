@@ -1,3 +1,4 @@
+import cors from "cors";
 import express, { Express, NextFunction, Request, Response } from "express";
 import { calculate, CalculationError } from "./calculator";
 
@@ -16,6 +17,9 @@ import { calculate, CalculationError } from "./calculator";
  */
 export function createApp(): Express {
   const app = express();
+  // Allows the standalone frontend (served from a different origin/port
+  // during development) to call this API from the browser.
+  app.use(cors());
   app.use(express.json());
 
   app.post("/api/calculations", (req: Request, res: Response) => {
